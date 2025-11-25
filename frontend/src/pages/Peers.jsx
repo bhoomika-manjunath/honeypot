@@ -1,55 +1,75 @@
 import React from 'react';
-import { Server, Wifi, WifiOff } from 'lucide-react';
+import { Globe, Cpu, Wifi } from 'lucide-react';
 import { useSocket } from '../context/SocketContext';
+import { GlassCard, PulseBadge } from '../components/UIComponents';
+import { motion } from 'framer-motion';
+import { formatTimeOnly } from '../utils/dateUtils';
 
 const Peers = () => {
     const { peers } = useSocket();
-    const peerArray = Object.entries(peers).map(([id, data]) => ({
-        id: data.node_id || id,
-        status: data.status || 'offline',
-        ip: data.ip || 'Unknown',
-        timestamp: data.timestamp || Date.now()
-    }));
 
     return (
         <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-white">NETWORK PEERS</h2>
-
-            {peerArray.length === 0 && (
-                <div className="bg-surface p-12 rounded-xl border border-gray-800 text-center">
-                    <p className="text-gray-500">No peers discovered yet. Waiting for peer announcements...</p>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h2 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
+                        <Globe className="text-emerald-500" />
+                        NETWORK NODES
+                    </h2>
+                    <p className="text-muted">Active mesh network participants</p>
                 </div>
-            )}
+                <PulseBadge status="online" text={`${Object.keys(peers).length} NODES ONLINE`} />
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {peerArray.map((peer) => (
-                    <div key={peer.id} className="bg-surface p-6 rounded-xl border border-gray-800 relative overflow-hidden group hover:border-primary/50 transition-colors">
-                        <div className={`absolute top-0 right-0 p-2 ${peer.status === 'online' ? 'text-green-500' : 'text-red-500'}`}>
-                            {peer.status === 'online' ? <Wifi size={20} /> : <WifiOff size={20} />}
-                        </div>
-
-                        <div className="flex items-center gap-4 mb-4">
-                            <div className="p-3 bg-background rounded-lg border border-gray-800 group-hover:border-primary/30 transition-colors">
-                                <Server className="text-gray-400 group-hover:text-primary transition-colors" />
+                {Object.entries(peers).map(([id, peer], index) => (
+                    <motion.div
+                        key={id}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: index * 0.1 }}
+                    >
+                        <GlassCard className="p-6 relative overflow-hidden group hover:border-emerald-500/30 transition-colors">
+                            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                                <Cpu size={96} />
                             </div>
-                            <div>
-                                <div className="font-bold text-lg text-white">{peer.id}</div>
-                                <div className="text-xs text-gray-500 font-mono">{peer.ip}</div>
-                            </div>
-                        </div>
 
-                        <div className="flex items-center justify-between text-sm border-t border-gray-800 pt-4 mt-2">
-                            <span className="text-gray-500">Status</span>
-                            <span className={`font-medium ${peer.status === 'online' ? 'text-green-500' : 'text-red-500'}`}>
-                                {peer.status.toUpperCase()}
-                            </span>
-                        </div>
-                        <div className="flex items-center justify-between text-sm mt-2">
-                            <span className="text-gray-500">Last Seen</span>
-                            <span className="text-gray-300 font-mono text-xs">{new Date(peer.timestamp * 1000).toLocaleTimeString()}</span>
-                        </div>
-                    </div>
+                            <div className="flex items-start justify-between mb-6">
+                                <div className="p-3 bg-emerald-500/10 rounded-xl text-emerald-500 border border-emerald-500/20">
+                                    <Wifi size={24} />
+                                </div>
+                                <div className="flex flex-col items-end">
+                                    <span className="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-full border border-emerald-500/20">
+                                        ONLINE
+                                    </span>
+                                    <span className="text-[10px] text-muted mt-1 font-mono">
+                                        Last seen: {formatTimeOnly(peer.timestamp)}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <div className="text-xs text-muted uppercase tracking-wider font-bold mb-1">Node ID</div>
+                                    <div className="text-lg font-bold text-white font-mono">{peer.node_id || id}</div>
+                                </div>
+                                <div>
+                                    <div className="text-xs text-muted uppercase tracking-wider font-bold mb-1">IP Address</div>
+                                    <div className="text-sm text-white font-mono bg-background/50 px-3 py-2 rounded-lg border border-white/5 inline-block">
+                                        {peer.ip || 'Unknown'}
+                                    </div>
+                                </div>
+                            </div>
+                        </GlassCard>
+                    </motion.div>
                 ))}
+
+                {Object.keys(peers).length === 0 && (
+                    <div className="col-span-full p-12 text-center text-muted border-2 border-dashed border-white/10 rounded-3xl">
+                        <Globe size={48} className="mx-auto mb-4 opacity-20" />
+                        <p>No peers currently connected to the mesh</p>
+                    </div>
+                )}
             </div>
         </div>
     );

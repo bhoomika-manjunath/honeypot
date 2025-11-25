@@ -7,14 +7,17 @@ export default {
     theme: {
         extend: {
             colors: {
-                background: '#1E1E1E',
-                primary: '#FFB300',
-                secondary: '#D32F2F',
-                text: '#E0E0E0',
-                surface: '#2D2D2D',
+                background: '#0f172a', // Slate 900
+                surface: '#1e293b',    // Slate 800
+                primary: '#3b82f6',    // Blue 500
+                secondary: '#ef4444',  // Red 500
+                text: '#f8fafc',       // Slate 50
+                muted: '#94a3b8',      // Slate 400
+                border: '#334155',     // Slate 700
             },
             fontFamily: {
-                mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+                sans: ['Inter', 'system-ui', 'sans-serif'],
+                mono: ['"JetBrains Mono"', 'monospace'],
             },
         },
     },

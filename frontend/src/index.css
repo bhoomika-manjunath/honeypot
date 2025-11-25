@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-background text-text font-mono antialiased;
+    @apply bg-background text-text font-sans antialiased selection:bg-primary/30;
   }
 }
 

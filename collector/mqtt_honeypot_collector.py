@@ -147,6 +147,22 @@ def get_ip():
     except:
         return "127.0.0.1"
 
+def cleanup_peers():
+    while True:
+        current_time = time.time()
+        to_remove = []
+        for peer_id, data in peers.items():
+            # Remove peers not seen for 30 seconds
+            if current_time - data.get('last_seen', 0) > 30:
+                to_remove.append(peer_id)
+        
+        for peer_id in to_remove:
+            del peers[peer_id]
+            # Broadcast removal
+            asyncio.run(manager.broadcast({"type": "PEER_REMOVED", "peer_id": peer_id}))
+            
+        time.sleep(5)
+
 def announce_presence(client):
     while True:
         payload = json.dumps({
@@ -181,6 +197,10 @@ if __name__ == "__main__":
     # Start announcement thread
     announce_thread = threading.Thread(target=announce_presence, args=(client,), daemon=True)
     announce_thread.start()
+
+    # Start cleanup thread
+    cleanup_thread = threading.Thread(target=cleanup_peers, daemon=True)
+    cleanup_thread.start()
 
     # Start API server (this will block and keep the program running)
     start_api()

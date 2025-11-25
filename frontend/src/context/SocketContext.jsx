@@ -50,6 +50,14 @@ export const SocketProvider = ({ children }) => {
                         }));
                         break;
 
+                    case 'PEER_REMOVED':
+                        setPeers(prev => {
+                            const newPeers = { ...prev };
+                            delete newPeers[message.peer_id];
+                            return newPeers;
+                        });
+                        break;
+
                     default:
                         console.log('Unknown message type:', message.type);
                 }

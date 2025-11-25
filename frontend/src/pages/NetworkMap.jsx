@@ -1,24 +1,37 @@
-import { useSocket } from '../context/SocketContext';
+import React from 'react';
+import { GlassCard } from '../components/UIComponents';
+import { Share2 } from 'lucide-react';
 
 const NetworkMap = () => {
-    const { peers } = useSocket();
-    const peerCount = Object.keys(peers).length;
-
     return (
-        <div className="h-[calc(100vh-12rem)] bg-surface rounded-xl border border-gray-800 flex items-center justify-center relative overflow-hidden">
-            <div className="absolute inset-0 grid grid-cols-[repeat(20,1fr)] grid-rows-[repeat(20,1fr)] opacity-10">
-                {Array.from({ length: 400 }).map((_, i) => (
-                    <div key={i} className="border border-primary/20"></div>
-                ))}
+        <div className="h-full flex flex-col space-y-6">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h2 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
+                        <Share2 className="text-indigo-500" />
+                        TOPOLOGY MAP
+                    </h2>
+                    <p className="text-muted">Visual representation of the honeypot mesh</p>
+                </div>
             </div>
 
-            <div className="text-center z-10">
-                <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-                    <div className="w-8 h-8 bg-primary rounded-full"></div>
+            <GlassCard className="flex-1 flex items-center justify-center min-h-[500px] relative overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-indigo-500/10 via-transparent to-transparent opacity-50"></div>
+
+                <div className="text-center relative z-10">
+                    <div className="relative inline-block">
+                        <div className="absolute inset-0 bg-indigo-500 blur-3xl opacity-20 animate-pulse"></div>
+                        <Share2 size={64} className="text-indigo-500 mb-6 relative z-10" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2">Visualization Engine Loading</h3>
+                    <p className="text-muted max-w-md mx-auto">
+                        Constructing 3D force-directed graph of active nodes and attack vectors...
+                    </p>
                 </div>
-                <h3 className="text-xl font-bold text-white">Network Topology</h3>
-                <p className="text-gray-500 mt-2">Visualizing {peerCount} active nodes...</p>
-            </div>
+
+                {/* Decorative grid lines */}
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+            </GlassCard>
         </div>
     );
 };
