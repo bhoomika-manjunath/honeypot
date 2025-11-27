@@ -1,12 +1,31 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { ShieldAlert, Activity, Server, Globe, Zap, Shield, Wifi } from 'lucide-react';
+import { ShieldAlert, Activity, Server, Globe, Zap, Shield, Wifi, Clock } from 'lucide-react';
 import { useSocket } from '../context/SocketContext';
 import { GlassCard, AnimatedStat, PulseBadge } from '../components/UIComponents';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Dashboard = () => {
-    const { attacks, peers } = useSocket();
+    const { attacks, peers, startTime } = useSocket();
+    const [uptime, setUptime] = useState('00:00:00');
+
+    // Uptime timer
+    useEffect(() => {
+        if (!startTime) return;
+
+        const interval = setInterval(() => {
+            const now = Date.now();
+            const diff = now - startTime;
+
+            const hours = Math.floor(diff / 3600000);
+            const minutes = Math.floor((diff % 3600000) / 60000);
+            const seconds = Math.floor((diff % 60000) / 1000);
+
+            setUptime(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [startTime]);
 
     // Generate chart data from attacks
     const chartData = useMemo(() => {
@@ -52,7 +71,13 @@ const Dashboard = () => {
                     <h2 className="text-3xl font-black text-white tracking-tight">COMMAND CENTER</h2>
                     <p className="text-muted">Real-time Threat Intelligence & Mesh Monitoring</p>
                 </div>
-                <PulseBadge status="online" text="SYSTEM ACTIVE" />
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl border border-white/10">
+                        <Clock size={16} className="text-blue-400" />
+                        <span className="text-blue-100 font-mono font-bold">{uptime}</span>
+                    </div>
+                    <PulseBadge status="online" text="SYSTEM ACTIVE" />
+                </div>
             </div>
 
             {/* Stats Grid */}

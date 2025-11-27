@@ -15,6 +15,7 @@ export const SocketProvider = ({ children }) => {
     const [peers, setPeers] = useState({});
     const [attacks, setAttacks] = useState([]);
     const [isConnected, setIsConnected] = useState(false);
+    const [startTime, setStartTime] = useState(null);
     const wsRef = useRef(null);
 
     useEffect(() => {
@@ -37,6 +38,9 @@ export const SocketProvider = ({ children }) => {
                         setNodeId(message.node_id);
                         setPeers(message.peers || {});
                         setAttacks(message.attacks || []);
+                        if (message.start_time) {
+                            setStartTime(message.start_time * 1000); // Convert to ms
+                        }
                         break;
 
                     case 'NEW_ATTACK':
@@ -89,6 +93,7 @@ export const SocketProvider = ({ children }) => {
         peers,
         attacks,
         isConnected,
+        startTime,
     };
 
     return (

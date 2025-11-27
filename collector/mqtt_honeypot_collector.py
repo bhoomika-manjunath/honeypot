@@ -24,6 +24,7 @@ ATTACK_TOPIC = "honeypot/attacks"
 peers = {}
 attacks = []
 active_connections: List[WebSocket] = []
+START_TIME = time.time()
 
 # Logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -64,7 +65,12 @@ manager = ConnectionManager()
 
 @app.get("/status")
 def get_status():
-    return {"node_id": NODE_ID, "uptime": "running", "peers_count": len(peers)}
+    return {
+        "node_id": NODE_ID, 
+        "uptime": time.time() - START_TIME, 
+        "start_time": START_TIME,
+        "peers_count": len(peers)
+    }
 
 @app.get("/peers")
 def get_peers():
@@ -79,7 +85,13 @@ async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
     try:
         # Send initial state
-        await websocket.send_json({"type": "INIT", "node_id": NODE_ID, "peers": peers, "attacks": attacks})
+        await websocket.send_json({
+            "type": "INIT", 
+            "node_id": NODE_ID, 
+            "peers": peers, 
+            "attacks": attacks,
+            "start_time": START_TIME
+        })
         while True:
             await websocket.receive_text()
     except WebSocketDisconnect:
